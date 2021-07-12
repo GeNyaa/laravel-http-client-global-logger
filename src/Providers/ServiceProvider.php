@@ -4,18 +4,33 @@ namespace Onlime\LaravelHttpClientGlobalLogger\Providers;
 
 use Illuminate\Http\Client\PendingRequest;
 use Monolog\Handler\StreamHandler;
-use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Onlime\LaravelHttpClientGlobalLogger\Mixins\PendingRequestMixin;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-class ServiceProvider extends BaseServiceProvider
+class ServiceProvider extends PackageServiceProvider
 {
     /**
-     * {@inheritdoc}
+     * This method is used by spatie/laravel-package-tools to setup the package.
+     *
+     * More info: https://github.com/spatie/laravel-package-tools
+     *
+     * @param Package $package
      */
-    public function register()
+    public function configurePackage(Package $package): void
     {
-        $this->mergeConfigFrom($this->configFileLocation(), 'http-client-global-logger');
+        $package
+            ->name('laravel-http-client-global-logger')
+            ->hasConfigFile();
+    }
 
+    /**
+     * Will be called at the end of the register method by spatie/laravel-package-tools.
+     *
+     * More info: https://github.com/spatie/laravel-package-tools
+     */
+    public function packageRegistered()
+    {
         if (config('http-client-global-logger.enabled') &&
             !config('http-client-global-logger.mixin')) {
             $this->app->register(EventServiceProvider::class);
@@ -23,14 +38,12 @@ class ServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * {@inheritdoc}
+     * Will be called at the end of the boot method by spatie/laravel-package-tools.
+     *
+     * More info: https://github.com/spatie/laravel-package-tools
      */
-    public function boot()
+    public function packageBooted()
     {
-        $this->publishes([
-            $this->configFileLocation() => config_path('http-client-global-logger.php'),
-        ], 'config');
-
         $channel = config('http-client-global-logger.channel');
         if (!array_key_exists($channel, config('logging.channels'))) {
             // Define new logging channel
@@ -49,15 +62,5 @@ class ServiceProvider extends BaseServiceProvider
         if (config('http-client-global-logger.mixin')) {
             PendingRequest::mixin(new PendingRequestMixin());
         }
-    }
-
-    /**
-     * Get package config file location.
-     *
-     * @return bool|string
-     */
-    protected function configFileLocation()
-    {
-        return realpath(__DIR__ . '/../../config/http-client-global-logger.php');
     }
 }
