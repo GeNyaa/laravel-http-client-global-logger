@@ -30,7 +30,7 @@
         "guzzlehttp/guzzle": "^7.5",
         "illuminate/http": "^9.0",
         "illuminate/support": "^9.0",
-        "monolog/monolog": "^2.0"
+        "monolog/monolog": "^2.0 || ^3.0"
     },
     "require-dev": {
         "laravel/framework": "^9.0",
