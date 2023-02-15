@@ -1,5 +1,5 @@
 {
-    "name": "onlime/laravel-http-client-global-logger",
+    "name": "genyaa/laravel-http-client-global-logger",
     "description": "A global logger for the Laravel HTTP Client",
     "keywords": [
         "onlime",
